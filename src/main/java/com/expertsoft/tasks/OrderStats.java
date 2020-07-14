@@ -71,7 +71,7 @@ class OrderStats {
      * @return map, where for each customer email there is a long referencing a number of different credit cards this customer uses.
      */
     static Map<String, Long> cardsCountForCustomer(final Stream<Customer> customers) {
-        return null;
+        return customers.collect(Collectors.toMap(Customer::getEmail,p->p.getOrders().stream().map(f->f.getPaymentInfo().getCardNumber()).distinct().count()));
     }
 
     /**
