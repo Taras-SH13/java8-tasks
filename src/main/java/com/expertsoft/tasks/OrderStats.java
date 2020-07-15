@@ -45,7 +45,11 @@ class OrderStats {
      */
     static Map<Integer, List<Order>> orderSizes(final Stream<Order> orders) {
 
-        return orders.collect(Collectors.groupingBy(f->f.getOrderItems().size()));
+        // return orders.collect(Collectors.groupingBy(f->f.getOrderItems().size()));
+        return orders
+                .collect(Collectors.groupingBy(order -> order.getOrderItems().stream().map(q->q.getQuantity()).reduce(0,(left, right) -> left + right)));
+
+
     }
 
     /**
