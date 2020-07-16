@@ -47,7 +47,7 @@ class OrderStats {
 
         // return orders.collect(Collectors.groupingBy(f->f.getOrderItems().size()));
         return orders
-                .collect(Collectors.groupingBy(order -> order.getOrderItems().stream().map(q->q.getQuantity()).reduce(0,(left, right) -> left + right)));
+                .collect(Collectors.groupingBy(order -> order.getOrderItems().stream().map(q -> q.getQuantity()).reduce(0, (left, right) -> left + right)));
 
 
     }
@@ -64,8 +64,11 @@ class OrderStats {
      */
     static Boolean hasColorProduct(final Stream<Order> orders, final Product.Color color) {
 
-        return orders.flatMap(ordersItem->ordersItem.getOrderItems().stream()).map(product->product.getProduct().getColor()).equals(color);
+       
+        return orders.allMatch(order -> order.getOrderItems().stream().map(x -> x.getProduct().getColor()).anyMatch(x->x.equals(color)));
+
     }
+
     /**
      * Task 4 (⚫⚫⚫⚫⚪)
      * <p>
@@ -75,7 +78,7 @@ class OrderStats {
      * @return map, where for each customer email there is a long referencing a number of different credit cards this customer uses.
      */
     static Map<String, Long> cardsCountForCustomer(final Stream<Customer> customers) {
-        return customers.collect(Collectors.toMap(Customer::getEmail,p->p.getOrders().stream().map(f->f.getPaymentInfo().getCardNumber()).distinct().count()));
+        return customers.collect(Collectors.toMap(Customer::getEmail, p -> p.getOrders().stream().map(f -> f.getPaymentInfo().getCardNumber()).distinct().count()));
     }
 
     /**
