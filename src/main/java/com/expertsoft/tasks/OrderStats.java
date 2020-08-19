@@ -138,6 +138,27 @@ class OrderStats {
      */
     static BigDecimal averageProductPriceForCreditCard(final Stream<Customer> customers, final String cardNumber) {
         final AveragingBigDecimalCollector collector = new AveragingBigDecimalCollector();
-        return null;
+        BigDecimal sum1 = null;
+
+        double sum2=0;
+
+        List<Order> orders = customers.flatMap(f -> f.getOrders().stream()).filter(x -> x.getPaymentInfo().getCardNumber() == cardNumber).collect(Collectors.toList());
+
+
+        List<BigDecimal> sum = orders.stream().flatMap(x -> x.getOrderItems().stream().map(v -> v.getProduct().getPrice())).collect(Collectors.toList());
+
+
+        List<Integer> quantity = orders.stream().flatMap(x -> x.getOrderItems().stream().map(v -> v.getQuantity())).collect(Collectors.toList());
+
+        for (BigDecimal a : sum
+        ) {
+            sum1 = sum1.add(a);
+        }
+        for (Integer a : quantity
+        ) {
+            sum2 = sum2 + a;
+        }
+
+       return null;
     }
 }
