@@ -3,13 +3,13 @@ package com.expertsoft.tasks;
 import com.expertsoft.model.*;
 import com.expertsoft.util.AveragingBigDecimalCollector;
 
+import javax.swing.*;
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * This class provides several methods to collect statistical information from customers and orders of an e-shop.
@@ -64,8 +64,8 @@ class OrderStats {
      */
     static Boolean hasColorProduct(final Stream<Order> orders, final Product.Color color) {
 
-       
-        return orders.allMatch(order -> order.getOrderItems().stream().map(x -> x.getProduct().getColor()).anyMatch(x->x.equals(color)));
+
+        return orders.allMatch(order -> order.getOrderItems().stream().map(x -> x.getProduct().getColor()).anyMatch(x -> x.equals(color)));
 
     }
 
@@ -102,7 +102,19 @@ class OrderStats {
      * @return java.util.Optional containing the name of the most popular country
      */
     static Optional<String> mostPopularCountry(final Stream<Customer> customers) {
-        return null;
+
+        return Optional.of(
+                customers.
+                        collect(Collectors.groupingBy(customer -> customer.getAddress().
+                                getCountry())).
+                        entrySet().
+                        stream().
+                        collect(Collectors.toMap(p1 -> p1.getKey(), p2 -> p2.getValue().size())).
+                        entrySet().
+                        stream().
+                        max(Comparator.comparing(Map.Entry::getValue)).get().getKey());
+
+
     }
 
     /**
