@@ -99,17 +99,6 @@ class OrderStats {
      * @return java.util.Optional containing the name of the most popular country
      */
     static Optional<String> mostPopularCountry(final Stream<Customer> customers) {
-
-//        return Optional.of(
-//                customers.
-//                        collect(Collectors.groupingBy(customer -> customer.getAddress().
-//                                getCountry())).
-//                        entrySet().
-//                        stream().
-//                        collect(Collectors.toMap(p1 -> p1.getKey(), p2 -> p2.getValue().size())).
-//                        entrySet().
-//                        stream().
-//                        max(Comparator.comparing(Map.Entry::getValue)).get().getKey());
         return customers
                 .collect(Collectors.groupingBy(c -> c.getAddress().getCountry()))
                 .entrySet().stream()
@@ -143,28 +132,6 @@ class OrderStats {
      */
     static BigDecimal averageProductPriceForCreditCard(final Stream<Customer> customers, final String cardNumber) {
         final AveragingBigDecimalCollector collector = new AveragingBigDecimalCollector();
-//        BigDecimal sum1 = null;
-//
-//        double sum2=0;
-//
-//        List<Order> orders = customers.flatMap(f -> f.getOrders().stream()).filter(x -> x.getPaymentInfo().getCardNumber() == cardNumber).collect(Collectors.toList());
-//
-//
-//        List<BigDecimal> sum = orders.stream().flatMap(x -> x.getOrderItems().stream().map(v -> v.getProduct().getPrice())).collect(Collectors.toList());
-//
-//
-//        List<Integer> quantity = orders.stream().flatMap(x -> x.getOrderItems().stream().map(v -> v.getQuantity())).collect(Collectors.toList());
-//
-//        for (BigDecimal a : sum
-//        ) {
-//            sum1 = sum1.add(a);
-//        }
-//        for (Integer a : quantity
-//        ) {
-//            sum2 = sum2 + a;
-//        }
-//
-//       return null;
         return customers
                 .flatMap(c -> c.getOrders().stream())
                 .filter(o -> o.getPaymentInfo().getCardNumber().equals(cardNumber))
