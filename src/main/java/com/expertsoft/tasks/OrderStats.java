@@ -6,10 +6,7 @@ import com.expertsoft.util.AveragingBigDecimalCollector;
 import javax.swing.*;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import java.util.stream.*;
 
 /**
  * This class provides several methods to collect statistical information from customers and orders of an e-shop.
@@ -103,17 +100,25 @@ class OrderStats {
      */
     static Optional<String> mostPopularCountry(final Stream<Customer> customers) {
 
-        return Optional.of(
-                customers.
-                        collect(Collectors.groupingBy(customer -> customer.getAddress().
-                                getCountry())).
-                        entrySet().
-                        stream().
-                        collect(Collectors.toMap(p1 -> p1.getKey(), p2 -> p2.getValue().size())).
-                        entrySet().
-                        stream().
-                        max(Comparator.comparing(Map.Entry::getValue)).get().getKey());
-
+//        return Optional.of(
+//                customers.
+//                        collect(Collectors.groupingBy(customer -> customer.getAddress().
+//                                getCountry())).
+//                        entrySet().
+//                        stream().
+//                        collect(Collectors.toMap(p1 -> p1.getKey(), p2 -> p2.getValue().size())).
+//                        entrySet().
+//                        stream().
+//                        max(Comparator.comparing(Map.Entry::getValue)).get().getKey());
+        return customers
+                .collect(Collectors.groupingBy(c -> c.getAddress().getCountry()))
+                .entrySet().stream()
+                .sorted(Map.Entry
+                        .<String, List<Customer>>comparingByValue(Comparator.comparingInt(List::size))
+                        .reversed()
+                        .thenComparing(Map.Entry.comparingByKey(Comparator.comparingInt(String::length))))
+                .map(Map.Entry::getKey)
+                .findFirst();
 
     }
 
@@ -138,27 +143,34 @@ class OrderStats {
      */
     static BigDecimal averageProductPriceForCreditCard(final Stream<Customer> customers, final String cardNumber) {
         final AveragingBigDecimalCollector collector = new AveragingBigDecimalCollector();
-        BigDecimal sum1 = null;
-
-        double sum2=0;
-
-        List<Order> orders = customers.flatMap(f -> f.getOrders().stream()).filter(x -> x.getPaymentInfo().getCardNumber() == cardNumber).collect(Collectors.toList());
-
-
-        List<BigDecimal> sum = orders.stream().flatMap(x -> x.getOrderItems().stream().map(v -> v.getProduct().getPrice())).collect(Collectors.toList());
-
-
-        List<Integer> quantity = orders.stream().flatMap(x -> x.getOrderItems().stream().map(v -> v.getQuantity())).collect(Collectors.toList());
-
-        for (BigDecimal a : sum
-        ) {
-            sum1 = sum1.add(a);
-        }
-        for (Integer a : quantity
-        ) {
-            sum2 = sum2 + a;
-        }
-
-       return null;
+//        BigDecimal sum1 = null;
+//
+//        double sum2=0;
+//
+//        List<Order> orders = customers.flatMap(f -> f.getOrders().stream()).filter(x -> x.getPaymentInfo().getCardNumber() == cardNumber).collect(Collectors.toList());
+//
+//
+//        List<BigDecimal> sum = orders.stream().flatMap(x -> x.getOrderItems().stream().map(v -> v.getProduct().getPrice())).collect(Collectors.toList());
+//
+//
+//        List<Integer> quantity = orders.stream().flatMap(x -> x.getOrderItems().stream().map(v -> v.getQuantity())).collect(Collectors.toList());
+//
+//        for (BigDecimal a : sum
+//        ) {
+//            sum1 = sum1.add(a);
+//        }
+//        for (Integer a : quantity
+//        ) {
+//            sum2 = sum2 + a;
+//        }
+//
+//       return null;
+        return customers
+                .flatMap(c -> c.getOrders().stream())
+                .filter(o -> o.getPaymentInfo().getCardNumber().equals(cardNumber))
+                .flatMap(o -> o.getOrderItems().stream())
+                .flatMap(l -> IntStream.rangeClosed(1, l.getQuantity()).mapToObj(e -> l.getProduct()))
+                .map(Product::getPrice)
+                .collect(collector);
     }
 }
